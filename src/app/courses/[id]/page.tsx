@@ -2,8 +2,10 @@ import { createClient } from '@/lib/supabase/server'
 import { BookOpen, Clock, Users, Star, Lock, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { EnrollButton } from '@/components/courses/EnrollButton'
-import { ModulesList } from '@/components/courses/ModulesList'
 import type { Database } from '@/lib/supabase/database.types'
+
+// Course components
+import { ModulesList } from '../../../components/courses/ModulesList'
 
 type Course = Database['public']['Tables']['courses']['Row']
 type Module = Database['public']['Tables']['course_modules']['Row']
