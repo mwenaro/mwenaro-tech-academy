@@ -35,9 +35,9 @@ export default async function InstructorCoursePage({
     .eq('id', params.courseId)
     .single()
 
-  if (!course || course.instructor_id !== user.id) {
+  if (!course || (course as Course).instructor_id !== user.id) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-light-gray to-white flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-light-gray to-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-dark-charcoal mb-4">Access Denied</h1>
           <p className="text-gray-600 mb-4">You don't have permission to manage this course.</p>
@@ -72,9 +72,9 @@ export default async function InstructorCoursePage({
     submissionsData?.filter((s) => s.status === 'graded') || []
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-light-gray to-white">
+    <div className="min-h-screen bg-linear-to-br from-light-gray to-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-deep-blue to-bright-teal text-white py-8">
+      <div className="bg-linear-to-r from-deep-blue to-bright-teal text-white py-8">
         <div className="max-w-7xl mx-auto px-4">
           <Link
             href="/dashboard"
@@ -82,7 +82,7 @@ export default async function InstructorCoursePage({
           >
             ← Back
           </Link>
-          <h1 className="text-4xl font-bold mb-2">{course.title}</h1>
+          <h1 className="text-4xl font-bold mb-2">{(course as Course).title}</h1>
           <p className="text-white text-opacity-90">Course Management</p>
         </div>
       </div>
@@ -173,7 +173,7 @@ export default async function InstructorCoursePage({
                         <span>Submitted {new Date(submission.submitted_at).toLocaleDateString()}</span>
                       </div>
                       <a
-                        href={submission.submission_link}
+                        href={submission.submission_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-bright-teal hover:underline text-sm"
@@ -239,7 +239,7 @@ export default async function InstructorCoursePage({
                             </span>
                           </td>
                           <td className="px-4 py-3">
-                            {submission.grade ? `${submission.grade}/100` : '-'}
+                            {submission.score ? `${submission.score}/100` : '-'}
                           </td>
                         </tr>
                       ))}
@@ -270,7 +270,7 @@ export default async function InstructorCoursePage({
                       key={enrollment.id}
                       className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
                     >
-                      <div className="w-8 h-8 bg-gradient-to-br from-bright-teal to-deep-blue rounded-full" />
+                      <div className="w-8 h-8 bg-linear-to-br from-bright-teal to-deep-blue rounded-full" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-dark-charcoal truncate">
                           {enrollment.user?.full_name}

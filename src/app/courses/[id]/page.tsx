@@ -5,8 +5,10 @@ import { EnrollButton } from '@/components/courses/EnrollButton'
 import { ModulesList } from '@/components/courses/ModulesList'
 import type { Database } from '@/lib/supabase/database.types'
 
+import type { Database } from '@/lib/supabase/database.types'
+
 type Course = Database['public']['Tables']['courses']['Row']
-type Module = Database['public']['Tables']['modules']['Row']
+type Module = Database['public']['Tables']['course_modules']['Row']
 type Lesson = Database['public']['Tables']['lessons']['Row']
 type Enrollment = Database['public']['Tables']['enrollments']['Row']
 
@@ -33,7 +35,7 @@ export default async function CourseDetailPage({
       `
       *,
       instructor:profiles!courses_instructor_id_fkey(full_name),
-      modules(
+      course_modules(
         *,
         lessons(*)
       )
@@ -69,7 +71,7 @@ export default async function CourseDetailPage({
   const isInstructor = user?.id === course.instructor_id
 
   // Get total lessons count
-  const totalLessons = (course as CourseWithDetails).modules?.reduce(
+  const totalLessons = (course as CourseWithDetails).course_modules?.reduce(
     (acc, m) => acc + (m.lessons?.length || 0),
     0
   ) || 0
@@ -155,7 +157,7 @@ export default async function CourseDetailPage({
               <h2 className="text-2xl font-bold text-dark-charcoal mb-6">Course Curriculum</h2>
 
               {isEnrolled || isInstructor ? (
-                <ModulesList modules={(course as CourseWithDetails).modules || []} courseId={params.id} />
+                <ModulesList modules={(course as CourseWithDetails).course_modules || []} courseId={params.id} />
               ) : (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 flex items-center gap-4">
                   <Lock className="text-blue-600 flex-shrink-0" size={24} />

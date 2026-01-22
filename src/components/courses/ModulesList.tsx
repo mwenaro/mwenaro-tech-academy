@@ -5,7 +5,7 @@ import { ChevronDown, Lock, Play, FileText, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import type { Database } from '@/lib/supabase/database.types'
 
-type Module = Database['public']['Tables']['modules']['Row']
+type Module = Database['public']['Tables']['course_modules']['Row']
 type Lesson = Database['public']['Tables']['lessons']['Row']
 
 interface ModulesListProps {
@@ -45,7 +45,7 @@ export function ModulesList({ modules, courseId }: ModulesListProps) {
           {expandedModule === module.id && (
             <div className="bg-white border-t border-gray-200 divide-y divide-gray-200">
               {module.lessons && module.lessons.length > 0 ? (
-                module.lessons.map((lesson, lessonIndex) => (
+                module.lessons.map((lesson: Lesson, lessonIndex: number) => (
                   <Link
                     key={lesson.id}
                     href={`/courses/${courseId}/lessons/${lesson.id}`}
@@ -56,7 +56,7 @@ export function ModulesList({ modules, courseId }: ModulesListProps) {
                         {lessonIndex + 1}
                       </span>
                       <div className="flex items-center gap-2">
-                        {lesson.type === 'video' ? (
+                        {lesson.content_type === 'video' ? (
                           <Play size={18} className="text-bright-teal" />
                         ) : (
                           <FileText size={18} className="text-bright-teal" />
@@ -67,11 +67,8 @@ export function ModulesList({ modules, courseId }: ModulesListProps) {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {lesson.duration && (
-                        <span className="text-sm text-gray-500">{lesson.duration} min</span>
-                      )}
-                      {lesson.is_completed && (
-                        <CheckCircle size={18} className="text-green-500" />
+                      {lesson.duration_minutes && (
+                        <span className="text-sm text-gray-500">{lesson.duration_minutes} min</span>
                       )}
                     </div>
                   </Link>

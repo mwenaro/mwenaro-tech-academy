@@ -31,9 +31,11 @@ export function EnrollButton({ courseId, isEnrolled }: EnrollButtonProps) {
         user_id: user.id,
         course_id: courseId,
         status: 'active',
-        enrollment_date: new Date().toISOString(),
+        enrolled_at: new Date().toISOString(),
         progress_percentage: 0,
-      })
+        payment_amount: 0,
+        payment_status: 'paid',
+      } as any)
 
       if (error) {
         toast.error(error.message)

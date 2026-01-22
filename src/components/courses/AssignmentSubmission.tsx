@@ -21,7 +21,7 @@ export function AssignmentSubmission({
   hasSubmitted,
   submission,
 }: AssignmentSubmissionProps) {
-  const [submissionLink, setSubmissionLink] = useState(submission?.submission_link || '')
+  const [submissionLink, setSubmissionLink] = useState(submission?.submission_url || '')
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,10 +46,10 @@ export function AssignmentSubmission({
 
       if (submission) {
         // Update existing submission
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('submissions')
           .update({
-            submission_link: submissionLink,
+            submission_url: submissionLink,
             submitted_at: new Date().toISOString(),
           })
           .eq('id', submission.id)
@@ -59,12 +59,11 @@ export function AssignmentSubmission({
           return
         }
       } else {
-        // Create new submission
-        const { error } = await supabase.from('submissions').insert({
-          lesson_id: lessonId,
+        // Create new submission - note: you need an assignment_id, this is a placeholder
+        const { error } = await (supabase as any).from('submissions').insert({
+          assignment_id: lessonId,
           user_id: user.id,
-          course_id: courseId,
-          submission_link: submissionLink,
+          submission_url: submissionLink,
           submitted_at: new Date().toISOString(),
           status: 'pending',
         })
@@ -126,7 +125,7 @@ export function AssignmentSubmission({
 
       {hasSubmitted && submission && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
-          <CheckCircle size={20} className="text-green-600 flex-shrink-0 mt-0.5" />
+          <CheckCircle size={20} className="text-green-600 shrink-0 mt-0.5" />
           <div className="text-sm">
             <p className="font-medium text-green-900">Submitted</p>
             <p className="text-green-700">
@@ -134,9 +133,9 @@ export function AssignmentSubmission({
             </p>
             {submission.status === 'graded' && (
               <div className="mt-2">
-                <p className="font-medium text-green-900">Grade: {submission.grade}/100</p>
-                {submission.feedback && (
-                  <p className="text-green-700 mt-1">{submission.feedback}</p>
+                <p className="font-medium text-green-900">Grade: {submission.score}/100</p>
+                {submission.instructor_feedback && (
+                  <p className="text-green-700 mt-1">{submission.instructor_feedback}</p>
                 )}
               </div>
             )}
