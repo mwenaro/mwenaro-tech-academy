@@ -1,10 +1,11 @@
+import { createBrowserClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from './database.types.js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
+export const supabase = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
 
 // For server-side operations that require service role
 // Only use this on the server side (API routes, server components)

@@ -17,21 +17,29 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
       if (error) {
         toast.error(error.message)
-      } else {
+        setLoading(false)
+        return
+      }
+
+      if (data.session) {
         toast.success('Login successful!')
-        router.push('/dashboard')
+        // Use router.replace for proper Next.js navigation
+        router.replace('/dashboard')
         router.refresh()
+      } else {
+        toast.error('Login failed - no session created')
+        setLoading(false)
       }
     } catch (error) {
+      console.error('Login error:', error)
       toast.error('An unexpected error occurred')
-    } finally {
       setLoading(false)
     }
   }
