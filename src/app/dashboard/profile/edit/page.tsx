@@ -6,6 +6,9 @@ import toast, { Toaster } from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Loader } from 'lucide-react'
 import Link from 'next/link'
+import type { Database } from '@/lib/supabase/database.types'
+
+type Profile = Database['public']['Tables']['profiles']['Row']
 
 export default function EditProfilePage() {
   const router = useRouter()
@@ -36,8 +39,8 @@ export default function EditProfilePage() {
 
         if (profile) {
           setFormData({
-            fullName: profile.full_name || '',
-            avatarUrl: profile.avatar_url || '',
+            fullName: (profile as Profile).full_name || '',
+            avatarUrl: (profile as Profile).avatar_url || '',
           })
         }
       } catch (error) {
