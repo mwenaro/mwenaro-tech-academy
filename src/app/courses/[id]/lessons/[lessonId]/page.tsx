@@ -5,12 +5,12 @@ import { AssignmentSubmission } from '@/components/courses/AssignmentSubmission'
 import type { Database } from '@/lib/supabase/database.types'
 
 type Lesson = Database['public']['Tables']['lessons']['Row']
-type Module = Database['public']['Tables']['modules']['Row']
+type Module = Database['public']['Tables']['course_modules']['Row']
 
 export default async function LessonPage({
   params,
 }: {
-  params: { courseId: string; lessonId: string }
+  params: { id: string; lessonId: string }
 }) {
   const supabase = await createClient()
 
@@ -138,7 +138,7 @@ export default async function LessonPage({
                 </div>
                 <AssignmentSubmission
                   lessonId={params.lessonId}
-                  courseId={params.courseId}
+                  courseId={params.id}
                   hasSubmitted={!!submission}
                   submission={submission}
                 />

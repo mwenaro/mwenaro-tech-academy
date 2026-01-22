@@ -16,7 +16,7 @@ type Submission = Database['public']['Tables']['submissions']['Row'] & {
 export default async function InstructorCoursePage({
   params,
 }: {
-  params: { courseId: string }
+  params: { id: string }
 }) {
   const supabase = await createClient()
 
@@ -32,10 +32,10 @@ export default async function InstructorCoursePage({
   const { data: course } = await supabase
     .from('courses')
     .select('*')
-    .eq('id', params.courseId)
+    .eq('id', params.id)
     .single()
 
-  if (!course || (course as Course).instructor_id !== user.id) {
+  if (!course || course.instructor_id !== user.id) {
     return (
       <div className="min-h-screen bg-linear-to-br from-light-gray to-white flex items-center justify-center">
         <div className="text-center">
@@ -53,14 +53,14 @@ export default async function InstructorCoursePage({
   const { data: enrollments } = await supabase
     .from('enrollments')
     .select('*, user:profiles(*)')
-    .eq('course_id', params.courseId)
+    .eq('course_id', params.id)
     .eq('status', 'active')
 
   // Get submissions with user and lesson info
   const { data: submissions } = await supabase
     .from('submissions')
     .select('*, user:profiles(*), lesson:lessons(*)')
-    .eq('course_id', params.courseId)
+    .eq('course_id', params.id)
     .order('submitted_at', { ascending: false })
 
   const enrollmentsData = enrollments as Enrollment[] | null
