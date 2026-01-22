@@ -20,7 +20,7 @@ export default function AdminRegisterPage() {
 
   // Secret admin key - change this to your preferred secret
   const ADMIN_SECRET_KEY = process.env.NEXT_PUBLIC_ADMIN_SECRET_KEY || 'mwerotech-admin-2026'
-
+// console.log({ADMIN_SECRET_KEY})
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -204,7 +204,7 @@ export default function AdminRegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-deep-blue text-white font-semibold py-3 px-4 rounded-lg hover:bg-opacity-90 transition disabled:opacity-50"
+              className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 mt-2"
             >
               {loading ? 'Creating Account...' : 'Create Admin Account'}
             </button>
