@@ -29,13 +29,15 @@ export default async function InstructorCoursePage({
   }
 
   // Get course
-  const { data: course } = await supabase
+  const { data: courseData } = await supabase
     .from('courses')
     .select('*')
     .eq('id', params.id)
     .single()
 
-  if (!course || course.instructor_id !== user.id) {
+  const course = courseData as unknown as Course | null
+
+  if (!course || (course as any).instructor_id !== user.id) {
     return (
       <div className="min-h-screen bg-linear-to-br from-light-gray to-white flex items-center justify-center">
         <div className="text-center">
