@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase/client'
 import toast, { Toaster } from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, Shield } from 'lucide-react'
@@ -20,7 +19,6 @@ export default function AdminRegisterPage() {
 
   // Secret admin key - change this to your preferred secret
   const ADMIN_SECRET_KEY = process.env.NEXT_PUBLIC_ADMIN_SECRET_KEY || 'mwerotech-admin-2026'
-// console.log({ADMIN_SECRET_KEY})
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -45,44 +43,31 @@ export default function AdminRegisterPage() {
     }
 
     try {
-      // Sign up the user
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
+      const response = await fetch('/api/admin/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          fullName: formData.fullName,
+          adminKey: formData.adminKey,
+        }),
       })
 
-      if (signUpError) {
-        toast.error(signUpError.message)
+      const result = await response.json()
+
+      if (!response.ok) {
+        toast.error(result?.error || 'Failed to create admin account')
         setLoading(false)
         return
       }
 
-      if (!authData.user) {
-        toast.error('Failed to create user')
-        setLoading(false)
-        return
-      }
-
-      // Update profile with admin role
-      const { error: profileError } = await (supabase as any)
-        .from('profiles')
-        .update({
-          full_name: formData.fullName,
-          role: 'admin',
-        })
-        .eq('id', authData.user.id)
-
-      if (profileError) {
-        console.error('Profile update error:', profileError)
-        toast.error('Account created but failed to set admin role. Please contact support.')
-        setLoading(false)
-        return
-      }
-
-      toast.success('Admin account created successfully!')
+      toast.success('Admin account created successfully! Please log in.')
       setTimeout(() => {
-        router.push('/dashboard')
-      }, 1500)
+        router.push('/auth/login')
+      }, 1200)
     } catch (error) {
       console.error('Registration error:', error)
       toast.error('An unexpected error occurred')
