@@ -1,9 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import AnalyticsDashboard from '@/components/analytics/AnalyticsDashboard'
-import { BarChart3, AlertCircle } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
 export default function AnalyticsPage() {
   const [userRole, setUserRole] = useState<string | null>(null)

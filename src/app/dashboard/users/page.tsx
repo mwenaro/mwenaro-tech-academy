@@ -15,13 +15,13 @@ export default async function UsersPage() {
   }
 
   // Check if user is admin
-  const { data: profile } = await supabase
-    .from('profiles')
+  const { data: profile } = await (supabase
+    .from('profiles') as any)
     .select('role')
     .eq('id', user.id)
     .single()
 
-  if (profile?.role !== 'admin') {
+  if ((profile as any)?.role !== 'admin') {
     return (
       <div className="text-center py-12">
         <Shield className="w-16 h-16 text-gray-300 mx-auto mb-4" />
