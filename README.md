@@ -123,7 +123,7 @@ Question format expected (example):
 
 ```bash
 node scripts/delete-supabase-users.js user1@example.com user2@example.com
-# To actually delete:
+# To actually delete (example):
 node scripts/delete-supabase-users.js --yes user1@example.com
 ```
 
