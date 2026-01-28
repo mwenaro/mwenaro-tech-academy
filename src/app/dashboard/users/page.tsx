@@ -1,9 +1,19 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Users, Mail, Calendar, Shield } from 'lucide-react'
+import ClientUserActions from '@/components/admin/UserActions'
+import InviteUserButton from '@/components/admin/InviteUserButton'
 import { redirect } from 'next/navigation'
 
-export default async function UsersPage() {
+// `UserActions` is a client component (uses "use client") and can be imported
+// directly into this server component. Next will automatically mark it as a
+// client boundary so it runs in the browser.
+
+export default async function UsersPage({
+  searchParams,
+}: {
+  searchParams?: { role?: string }
+}) {
   const supabase = await createClient()
 
   const {
@@ -35,19 +45,29 @@ export default async function UsersPage() {
     )
   }
 
-  // Get all users
-  const { data: users } = await supabase
-    .from('profiles')
-    .select('*')
-    .order('created_at', { ascending: false })
+  // Resolve search params (Next may provide a Promise)
+  const resolvedSearchParams = searchParams instanceof Promise ? await searchParams : searchParams
+
+  // Get users (optionally filter by role)
+  let query: any = supabase.from('profiles').select('*').order('created_at', { ascending: false })
+  if (resolvedSearchParams?.role) {
+    query = query.eq('role', resolvedSearchParams.role)
+  }
+
+  const { data: users } = await query
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Users</h1>
-        <p className="text-gray-600">
-          Manage platform users and their roles
-        </p>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{searchParams?.role ? (searchParams.role === 'learner' ? 'Learners' : 'Instructors') : 'Users'}</h1>
+          <p className="text-gray-600">
+            {searchParams?.role
+              ? `Manage ${searchParams.role === 'learner' ? 'learners' : 'instructors'}`
+              : 'Manage platform users and their roles'}
+          </p>
+        </div>
+        <InviteUserButton />
       </div>
 
       {users && users.length > 0 ? (
@@ -103,9 +123,13 @@ export default async function UsersPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                        Active
-                      </span>
+                      {/* Actions */}
+                      <div className="flex items-center gap-4">
+                        {/* Dynamically load the client actions component to avoid SSR issues */}
+                        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                        {/* @ts-ignore */}
+                        <ClientUserActions id={u.id} role={u.role} />
+                      </div>
                     </td>
                   </tr>
                 ))}

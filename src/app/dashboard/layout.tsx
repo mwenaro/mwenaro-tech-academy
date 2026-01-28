@@ -152,6 +152,20 @@ export default async function DashboardLayout({
                   <span className="font-medium">Manage Courses</span>
                 </Link>
                 <Link
+                  href="/dashboard/users?role=learner"
+                  className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-primary/10 text-foreground hover:text-primary transition-colors"
+                >
+                  <Users className="w-5 h-5" />
+                  <span className="font-medium">Learners</span>
+                </Link>
+                <Link
+                  href="/dashboard/users?role=instructor"
+                  className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-primary/10 text-foreground hover:text-primary transition-colors"
+                >
+                  <User className="w-5 h-5" />
+                  <span className="font-medium">Instructors</span>
+                </Link>
+                <Link
                   href="/dashboard/users"
                   className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-primary/10 text-foreground hover:text-primary transition-colors"
                 >
