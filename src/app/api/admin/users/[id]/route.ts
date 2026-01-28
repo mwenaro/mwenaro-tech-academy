@@ -26,11 +26,11 @@ export async function PATCH(request: NextRequest, context: any) {
     }
 
     // Verify caller is admin
-    const { data: callerProfile } = await supabase
+    const { data: callerProfile } = await (supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .single() as any)
 
     if (!callerProfile || callerProfile.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -92,11 +92,11 @@ export async function DELETE(request: NextRequest, context: any) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: callerProfile } = await supabase
+    const { data: callerProfile } = await (supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .single() as any)
 
     if (!callerProfile || callerProfile.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })

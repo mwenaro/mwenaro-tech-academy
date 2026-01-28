@@ -25,9 +25,15 @@ export default function ResetPasswordPage() {
       if (type === 'recovery' && token) {
         setAccessToken(token)
         // Try to set session so updateUser works
-        supabase.auth.setSession({ access_token: token, refresh_token: refresh || undefined }).catch((err) => {
-          console.warn('setSession failed', err)
-        }).finally(() => setReady(true))
+        if (refresh) {
+          (supabase.auth.setSession as any)({ access_token: token as string, refresh_token: refresh }).catch((err: any) => {
+            console.warn('setSession failed', err)
+          }).finally(() => setReady(true))
+        } else {
+          (supabase.auth.setSession as any)({ access_token: token as string }).catch((err: any) => {
+            console.warn('setSession failed', err)
+          }).finally(() => setReady(true))
+        }
       } else {
         setReady(true)
       }
@@ -53,7 +59,7 @@ export default function ResetPasswordPage() {
     try {
       if (accessToken) {
         // Ensure session is set with the recovery token
-        await supabase.auth.setSession({ access_token: accessToken })
+        await (supabase.auth.setSession as any)({ access_token: accessToken as string })
       }
 
       const { error } = await supabase.auth.updateUser({ password })

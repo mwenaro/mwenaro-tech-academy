@@ -2,10 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { BookOpen, Clock, CheckCircle, ChevronLeft, ChevronRight, Lock, Play } from 'lucide-react'
 import Link from 'next/link'
 import type { Database } from '@/lib/supabase/database.types'
-import dynamic from 'next/dynamic'
-
-// Client-side Quiz component (lazy loaded)
-const Quiz = dynamic(() => import('@/components/courses/Quiz').then((m) => m.Quiz), { ssr: false })
+import { Quiz } from '@/components/courses/Quiz'
 
 type Lesson = Database['public']['Tables']['lessons']['Row']
 type Module = Database['public']['Tables']['course_modules']['Row']

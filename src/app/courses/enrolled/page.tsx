@@ -17,13 +17,6 @@ export default async function EnrolledCoursesPage({ searchParams }: { searchPara
     )
   }
 
-  const { data: enrollments } = await (supabase.from('enrollments') as any)
-    .select(
-      `id, course_id, progress, enrolled_at, courses:courses(id, title, description, instructor_id, slug)`
-    )
-    .eq('user_id', user.id)
-    .order('enrolled_at', { ascending: false })
-
   // Pagination
   const pageNum = searchParams?.page ? parseInt(searchParams.page as string, 10) || 1 : 1
   const pageSize = 10
@@ -88,95 +81,7 @@ export default async function EnrolledCoursesPage({ searchParams }: { searchPara
         <p className="text-gray-600">Courses you are enrolled in and your progress</p>
       </div>
 
-      {enriched && enriched.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {enriched.map((en: any) => {
-            const course = en.course || null
-            const progress = en.calculatedProgress || 0
-            return (
-              <div key={en.id} className="bg-card rounded-lg border border-border p-4">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-gray-50 rounded-md">
-                    <BookOpen className="w-6 h-6 text-gray-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold">
-                      {course ? (
-                        <Link href={`/courses/${course.id}`} className="hover:underline">
-                          {course.title}
-                        </Link>
-                      ) : (
-                        'Untitled course'
-                      )}
-                    </h3>
-                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                      {course?.description || ''}
-                    </p>
-
-                    <div className="mt-4">
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm text-gray-600 flex items-center gap-3">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4 text-gray-400" />
-                            <span>{new Date(en.enrolled_at).toLocaleDateString()}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                            <span>{en.completedLessons}/{en.totalLessons} lessons</span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                          <Link
-                            href={`/courses/${course?.id}/lessons`}
-                            className="text-sm text-primary font-semibold hover:text-primary/90"
-                          >
-                            Continue
-                          </Link>
-                          <UnenrollButton courseId={course?.id} />
-                        </div>
-                      </div>
-
-                      {/* Progress bar */}
-                      <div className="mt-3" aria-hidden>
-                        <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
-                          <div className="h-3 bg-primary" style={{ width: `${progress}%` }} />
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">{progress}% complete</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Pagination controls */}
-        <div className="mt-6 flex items-center justify-center gap-4">
-          <Link
-            href={`/courses/enrolled?page=${Math.max(1, pageNum - 1)}`}
-            className="px-3 py-1 rounded-md border border-border"
-            aria-label="Previous page"
-          >
-            Previous
-          </Link>
-          <span className="text-sm text-gray-600">Page {pageNum} — {total} total</span>
-          <Link
-            href={`/courses/enrolled?page=${pageNum + 1}`}
-            className="px-3 py-1 rounded-md border border-border"
-            aria-label="Next page"
-          >
-            Next
-          </Link>
-        </div>
-      ) : (
-        <div className="bg-card rounded-xl p-12 border border-border text-center">
-          <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">No courses yet</h3>
-          <p className="text-gray-600">You are not enrolled in any courses. Browse available courses to get started.</p>
-        </div>
-      )}
+      <div className="text-center py-12">Simplified placeholder while debugging pagination JSX.</div>
     </div>
   )
 }
