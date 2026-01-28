@@ -2,6 +2,10 @@ import { createClient } from '@/lib/supabase/server'
 import { BookOpen, Clock, CheckCircle, ChevronLeft, ChevronRight, Lock, Play } from 'lucide-react'
 import Link from 'next/link'
 import type { Database } from '@/lib/supabase/database.types'
+import dynamic from 'next/dynamic'
+
+// Client-side Quiz component (lazy loaded)
+const Quiz = dynamic(() => import('@/components/courses/Quiz').then((m) => m.Quiz), { ssr: false })
 
 type Lesson = Database['public']['Tables']['lessons']['Row']
 type Module = Database['public']['Tables']['course_modules']['Row']
@@ -248,9 +252,29 @@ export default async function LessonPage({
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
                     <h3 className="font-semibold text-dark-charcoal mb-2">Quiz Available</h3>
                     <p className="text-gray-600 mb-4">Test your knowledge with the quiz for this lesson.</p>
-                    <button className="bg-bright-teal text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition">
-                      Start Quiz
-                    </button>
+                    {(() => {
+                      // Parse questions from lesson.content (expected JSON array)
+                      let questions: any[] = []
+                      try {
+                        questions = typeof lesson.content === 'string' && lesson.content.trim()
+                          ? JSON.parse(lesson.content as string)
+                          : []
+                      } catch (e) {
+                        questions = []
+                      }
+
+                      if (!Array.isArray(questions) || questions.length === 0) {
+                        return (
+                          <div className="text-sm text-gray-600">No quiz configured for this lesson.</div>
+                        )
+                      }
+
+                      return (
+                        <div className="space-y-4">
+                          <Quiz lessonId={lesson.id} courseId={params.id} questions={questions} />
+                        </div>
+                      )
+                    })()}
                   </div>
                 ) : (
                   <div className="text-gray-600 italic">

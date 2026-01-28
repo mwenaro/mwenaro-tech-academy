@@ -42,45 +42,76 @@ export async function POST(request: NextRequest) {
     const { quizId, answers, courseId } = body
 
     if (!quizId || !answers || !courseId) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Store quiz attempt
-    const { data: attempt, error: attemptError } = await (supabase
-      .from('quiz_attempts') as any)
+    // Load canonical quiz data from lesson.content (server-side source of truth)
+    const { data: lesson } = await (
+      supabase
+        .from('lessons')
+        .select('id, content, content_type')
+        .eq('id', quizId)
+        .single() as any
+    )
+
+    if (!lesson || lesson.content_type !== 'quiz') {
+      return NextResponse.json({ error: 'Quiz not found' }, { status: 404 })
+    }
+
+    let canonicalQuestions: any[] = []
+    try {
+      canonicalQuestions = typeof lesson.content === 'string' && lesson.content.trim()
+        ? JSON.parse(lesson.content as string)
+        : []
+    } catch (e) {
+      console.warn('Failed to parse quiz content for lesson', quizId, e)
+      canonicalQuestions = []
+    }
+
+    if (!Array.isArray(canonicalQuestions) || canonicalQuestions.length === 0) {
+      return NextResponse.json({ error: 'No quiz questions configured' }, { status: 500 })
+    }
+
+    // Compute score deterministically on server by comparing selectedOption to correctAnswer
+    const normalizedAnswers = Array.isArray(answers) ? answers : []
+    let correctCount = 0
+    const reviewedAnswers = canonicalQuestions.map((q: any) => {
+      const submitted = normalizedAnswers.find((a: any) => a.questionId === q.id)
+      const selected = submitted ? submitted.selectedOption : null
+      const isCorrect = selected === q.correctAnswer
+      if (isCorrect) correctCount += 1
+      return {
+        questionId: q.id,
+        selectedOption: selected,
+        isCorrect,
+      }
+    })
+
+    const score = Math.round((correctCount / canonicalQuestions.length) * 100)
+
+    // Store quiz attempt with server-calculated results
+    const { data: attempt, error: attemptError } = await (supabase.from('quiz_attempts') as any)
       .insert({
         lesson_id: quizId,
         user_id: user.id,
         course_id: courseId,
-        answers_submitted: answers,
+        answers_submitted: reviewedAnswers,
+        score,
         attempted_at: new Date().toISOString(),
       })
       .select()
       .single()
 
     if (attemptError) {
-      return NextResponse.json(
-        { error: 'Failed to save quiz attempt' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to save quiz attempt' }, { status: 500 })
     }
 
-    // Calculate score (this would typically be done with stored quiz data)
-    // For now, we'll just store the attempt and return success
-    const score = Math.round((answers.filter((a: any) => a.isCorrect).length / answers.length) * 100)
-
-    return NextResponse.json(
-      {
-        message: 'Quiz submitted successfully',
-        attemptId: attempt.id,
-        score,
-        passedRequired: score >= 70,
-      },
-      { status: 201 }
-    )
+    return NextResponse.json({
+      message: 'Quiz submitted successfully',
+      attemptId: attempt.id,
+      score,
+      passedRequired: score >= 70,
+    }, { status: 201 })
   } catch (error) {
     console.error('Quiz submission error:', error)
     return NextResponse.json(
